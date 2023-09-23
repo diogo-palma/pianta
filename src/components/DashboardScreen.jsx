@@ -12,14 +12,14 @@ function DashboardScreen({ navigation }) {
   const TabsNavigator = createBottomTabNavigator();
   return (
     <View style={{ flex: 1 }}>
-      <StatusBar backgroundColor="#45AC9C" />
+      <StatusBar backgroundColor="#4b7350" />
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <TabsNavigator.Navigator
           initialRouteName="Home"
           tabBar={({ state, descriptors, navigation }) => (
             <BottomTabs 
               tabsData={BottomTabsData} 
-              tabBarBackground="#45AC9C"
+              tabBarBackground="#4b7350"
               textColor="#FFFFFF"
               activeTabBackground="#FFFFFF"
               navigationHandler={(screen: string) => {

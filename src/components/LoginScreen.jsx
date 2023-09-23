@@ -1,36 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image,  
-  StyleSheet, Dimensions,Alert, TextInput,TouchableOpacity, 
-  ScrollView, ActivityIndicator
-} from 'react-native';
-
+import { View, Text, Image, StyleSheet, Dimensions, Alert, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, ImageBackground, Platform } from 'react-native';
+import { useFonts, Roboto_500Medium,Roboto_300Light } from '@expo-google-fonts/roboto';
 import axios from "axios";
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
+  const [fontsLoaded] = useFonts({
+    RobotoMedium: Roboto_500Medium,
+    RobotoLight: Roboto_300Light
+  });
 
+
+  const toggleCheckbox = () => {
+    setIsChecked(!isChecked);
+  };
+
+ 
 
   const autoLogin = async () => {
     try {
       const savedUsername = await AsyncStorage.getItem('username');
       const savedPassword = await AsyncStorage.getItem('password');
-  
+
       if (savedUsername !== null && savedPassword !== null) {
-        
         setUsername(savedUsername);
-        setPassword(savedPassword);        
-        
-        
-        console.log("username", username)
-        console.log("password", password)
+        setPassword(savedPassword);
+
         if (username && password)
-          handleLogin()
-        
+          handleLogin();
       }
     } catch (error) {
       console.error('Erro ao recuperar os dados de login:', error);
@@ -38,6 +40,8 @@ function LoginScreen({ navigation }) {
   };
 
   useEffect(() => {
+    // AsyncStorage.removeItem('username')
+    // AsyncStorage.removeItem('password')
     autoLogin();
   }, [username, password]);
 
@@ -57,13 +61,13 @@ function LoginScreen({ navigation }) {
       )
       .then((response) => {
         if (response.data.status === "ok") {
-          console.log("response.data.user", response.data.user)
-          AsyncStorage.setItem('username', username);
-          AsyncStorage.setItem('password', password);
+          if (isChecked){
+            AsyncStorage.setItem('username', username);
+            AsyncStorage.setItem('password', password);
+          }
           AsyncStorage.setItem('user', JSON.stringify(response.data.user));
           navigation.navigate("Dashboard");
         } else {
-          
           Alert.alert(
             "Errore di autenticazione",
             "Le credenziali non sono corrette."
@@ -71,7 +75,6 @@ function LoginScreen({ navigation }) {
         }
       })
       .catch((error) => {
-
         console.error("Erro ao fazer login:", error);
         Alert.alert(
           "Errore di autenticazione",
@@ -79,7 +82,7 @@ function LoginScreen({ navigation }) {
         );
       })
       .finally(() => {
-        setIsLoading(false); 
+        setIsLoading(false);
       })
   };
 
@@ -87,65 +90,53 @@ function LoginScreen({ navigation }) {
     header: null,
   }
 
+  if (!fontsLoaded) {   
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Caricamento...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View>
-        {/* Contianer 1 */}
-        <View style={{ backgroundColor: "#ffffff" }}>
-          <View
-            style={{
-              backgroundColor: "#45AC9C",
-              padding: 50,
-              borderBottomLeftRadius: 60,
-            }}
-          >
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <Image
-                style={{ width: 300, height: 200, resizeMode: "contain" }}
-                source={require("../../assets/que-curam.png")}
-              />
-            </View>
-
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <Text style={{ fontWeight: "500", fontSize: 16, color: "#fff" }}>
-                Effettuare l'accesso
-              </Text>             
-            </View>
-          </View>
-        </View>
-
-        {/* Container 2 */}
-        <View style={{ backgroundColor: "#45AC9C" }}>
-          <View
-            style={{
-              justifyContent: "center",
-              backgroundColor: "#fff",
-              paddingHorizontal: 30,
-              borderTopRightRadius: 60,
-            }}
-          >
-            <View style={styles.spacing_big}></View>
-
-            <View style={styles.label}>
-              <Text style={styles.label}>Email</Text>
-            </View>
-            <TextInput
-              style={styles.input}
+      <View style={{ alignItems: 'start', height: 350 }}>
+        <ImageBackground 
+          source={require('../../assets/login-background.png')} 
+          style={{ width: "100%", height: "100%", resizeMode: 'cover', alignSelf: 'flex-start' }}
+        />
+      </View>
+      <View style={{alignItems: 'center', marginTop: 20}}>
+        <Text style={{ fontWeight: "500", fontSize: 32, color: "#4b7350", fontFamily: 'RobotoMedium' }}>
+          Benvenuto
+        </Text>
+        <Image
+         source={require('../../assets/leaf-watter.png')} 
+         style={{width: 80, height: 80, position: 'absolute', right: 0}}
+        />
+        <Text style={{ fontSize: 14, color: "#ccc" }}>
+          Effettuare l'accesso
+        </Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="user" style={styles.searchIcon} />
+          <TextInput
+              style={styles.inputLabel}
               autoCapitalize="none"
+              placeholder="Email"
+              placeholderTextColor="#4b7350"
               onChangeText={setUsername}              
               value={username}
               onSubmitEditing={() => { this.passwordTextInput.focus(); }}
-            />
-
-            <View style={styles.spacing}></View>
-
-            <View style={styles.label}>
-              <Text style={styles.label}>Password</Text>
-            </View>
-            <TextInput
+          />
+        </View>
+        <View style={[styles.inputContainer, {marginTop: -8}]}>
+          <FontAwesome5 name="lock" style={styles.searchIcon} />
+          <TextInput
               ref={(input) => { this.passwordTextInput = input; }}
-              style={styles.input}
+              style={styles.inputLabel}
               autoCapitalize="none"
+              placeholder="Password"
+              placeholderTextColor="#4b7350"
               autoCorrect={false}
               secureTextEntry={true}
               value={password}
@@ -153,29 +144,36 @@ function LoginScreen({ navigation }) {
               onSubmitEditing={() => {
                 handleLogin()
               }}
-            />
-
-            <View style={styles.spacing}></View>
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
-                <View
-                  style={[
-                    styles.loginButton,
-                    isLoading && styles.loadingButton,
-                  ]}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="white" style={styles.loadingIndicator} />
-                  ) : (
-                    <Text style={styles.loginButtonText}>Accedere</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
+          />
         </View>
       </View>
+      <TouchableOpacity style={styles.checkboxContainer} onPress={toggleCheckbox}>
+        {isChecked ? (
+          <FontAwesome5 name="check-square" style={styles.checkedIcon} />
+        ) : (
+          <FontAwesome5 name="square" style={styles.uncheckedIcon} />
+        )}
+        <Text style={styles.labelCheckBox}>Ricordati di me</Text>
+      </TouchableOpacity>
+      
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
+          <View
+            style={[
+              styles.loginButton,
+              isLoading && styles.loadingButton,
+            ]}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="white" style={styles.loadingIndicator} />
+            ) : (
+              <Text style={styles.loginButtonText}>Accedere</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      </View>
+      
+          
     </ScrollView>
   );
 }
@@ -184,81 +182,83 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1, 
-    backgroundColor: "#fff", 
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    
   },
-  spacing: {
-        margin: 10
-    }, 
-    spacing_big: {
-      margin: 30
-  },  
-    label: {
-        // justifyContent: 'center',
-        // alignItems: 'center',\
-        fontWeight: '300',
-        paddingLeft: 5,
-        fontSize: 17,
-        color: '#999',
-        
-    },  
-    input: {
-        height: 40,
-        margin: 5,
-        borderRadius: 100,
-        backgroundColor: '#e7e7e7',
-        padding: 10,
-
-      },
-      imagecontainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      image_logo: {
-        width: 200,
-        height: 200,
-        resizeMode: 'contain',
-        
-      },
-      card: {
-        backgroundColor: '#fff',
-        padding: 10,
-        margin: 10,
-        borderRadius: 7,
-        elevation: 5,
-        marginTop: 100,
-
-        // alignItems:'center',
-        // justifyContent:'center'
-      },
-      buttonContainer: {
-        justifyContent: "center",
-        alignItems: "center",
-      },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: "#dce5de",
+    borderColor: '#ccc',
     
-      loginButton: {
-        margin: 10,
-        width: 200,
-        backgroundColor: "#45AC9C",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 100,
-        paddingVertical: 5,
-      },
-    
-      loadingButton: {
-        backgroundColor: "#999", 
-        margin: 10,
-        paddingVertical: 5,
-      },
-    
-      loginButtonText: {
-        color: "white",
-        fontSize: 20,
-      },
-      loadingIndicator: {
-        width: 40,
-        height: 30,
-      },
+    borderRadius: 15, 
+    paddingLeft: 14,
+    height: 55,
+    margin: 20,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 10, 
+    color: '#4b7350', 
+  },
+  inputLabel: {
+    fontFamily: 'RobotoLight',
+    flex: 1, 
+    height: 40,
+    fontSize: 12,
+    color: 'black', 
+    paddingVertical: 0,
+  },
+  buttonContainer: {
+    marginTop: 50,
+    flex: 1,    
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginButton: {
+    margin: 10,
+    width: 280,
+    height: 50,
+    backgroundColor: "#4b7350",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,    
+  },
 
+  loadingButton: {
+    backgroundColor: "#999", 
+    margin: 10,
+    paddingVertical: 5,
+  },
+
+  loginButtonText: {
+    fontFamily: 'RobotoMedium',
+    color: "white",
+    fontSize: 16,
+  },
+  loadingIndicator: {
+    width: 40,
+    height: 30,
+  },
+  checkboxContainer: {    
+    marginLeft: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkedIcon: {
+    fontSize: 18,
+    color: 'green',
+  },
+  uncheckedIcon: {
+    fontSize: 18,
+    color: 'gray',
+  },
+  labelCheckBox: {
+    fontFamily: 'RobotoMedium',
+    marginLeft: 10,
+    fontSize: 12,
+    color: "#4b7350"
+  },
+ 
 });
