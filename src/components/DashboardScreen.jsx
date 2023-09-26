@@ -16,10 +16,8 @@ function DashboardScreen({ navigation }) {
 
   const changeTab = (tabName, data) => {        
     setDataTab(data)
-    navigation.navigate(tabName, {category: data})
-    console.log("data",data)
+    navigation.navigate(tabName, {categorySelected: data})    
     setActiveTab(tabName);
-    
   }
   
   return (
