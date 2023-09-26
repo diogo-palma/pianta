@@ -1,8 +1,38 @@
 import React from 'react';
-import { View, Text, TextInput, Image, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, TextInput,TouchableWithoutFeedback, Image, ImageBackground, StyleSheet } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {
+  useFonts,
+  DMSans_400Regular,
+  DMSans_400Regular_Italic,
+  DMSans_500Medium,
+  DMSans_500Medium_Italic,
+  DMSans_700Bold,
+  DMSans_700Bold_Italic,
+} from '@expo-google-fonts/dm-sans';
 
-function Header({ user, greeting, iconWheater }) {
+function Header({ user, greeting, iconWheater, onTabChange }) {
+
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_400Regular_Italic,
+    DMSans_500Medium,
+    DMSans_500Medium_Italic,
+    DMSans_700Bold,
+    DMSans_700Bold_Italic,
+  });
+
+  const handleFilterPress = (tabName, data) => {
+    onTabChange(tabName, data);
+  }
+
+  if (!fontsLoaded) {   
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Caricamento...</Text>
+      </View>
+    );
+  }
   return (
     <ImageBackground style={styles.imageBackgroundView}
       source={require('../../../assets/plant-top.jpg')}
@@ -19,17 +49,17 @@ function Header({ user, greeting, iconWheater }) {
           <Text style={styles.greeting}>{greeting}</Text>
           <Image style={styles.weatherIcon} source={iconWheater} />
         </View>
-        <View style={styles.inputContainer}>
-          <FontAwesome5 name="search" style={styles.searchIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Filtraggio di piante ..."
-            placeholderTextColor="#ccc"
-            onChangeText={(text) => {
-
-            }}
-          />
-        </View>
+        <TouchableWithoutFeedback onPress={() => handleFilterPress('Leaf', null)}>
+          <View style={styles.inputContainer}>
+            <FontAwesome5 name="search" style={styles.searchIcon}  />
+            <Text
+              style={styles.input}              
+              
+            >
+              Filtraggio di piante ...
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     </ImageBackground>
   );
@@ -41,17 +71,17 @@ const styles = StyleSheet.create({
     marginBottom: 15
   },
   text: {
-    
+    fontFamily: 'DMSans_400Regular'
   },
   greeting: {
     marginTop: 2,
-    fontFamily: 'OswaldMedium',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 20
   },
   weatherIcon:{
     marginLeft: 5,
-    height: 40,
-    width: 60
+    height: 30,
+    width: 25
   },
   inputContainer: {    
     flexDirection: 'row',
@@ -72,9 +102,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1, 
     height: 40,
-    fontSize: 12,
-    color: 'black', 
+    fontSize: 16,
+    color: "#ccc",    
     paddingVertical: 0,
+    marginTop: 10
   },
 });
 

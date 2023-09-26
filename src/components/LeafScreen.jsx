@@ -1,16 +1,18 @@
 import React from 'react';
-import { View, Button } from 'react-native';
+import { View, Text } from 'react-native';
 
-function LeafScreen({ navigation }) {
+
+function LeafScreen({ route }) {  
+  console.log("data leaf",  route.params )
+  let category = {}
+  if (route.params?.category){
+    console.log("oiii", route.params.category)
+    category = route.params
+  }
+  
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button
-        title="Leaf"
-        onPress={() => {
-          // Lógica a ser executada quando o botão é pressionado
-          // Você pode adicionar ações de navegação ou outras ações aqui
-        }}
-      />
+      <Text>{JSON.stringify(category, null, 2)}</Text>
     </View>
   );
 }

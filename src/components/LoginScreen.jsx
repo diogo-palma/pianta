@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, Dimensions, Alert, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, ImageBackground, Platform } from 'react-native';
+import { View, Text, Image, 
+  StyleSheet, Dimensions, Alert, TextInput, 
+  TouchableOpacity, ScrollView, 
+  ActivityIndicator, ImageBackground, Platform } from 'react-native';
 import { useFonts, Roboto_500Medium,Roboto_300Light } from '@expo-google-fonts/roboto';
 import axios from "axios";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Animatable from 'react-native-animatable';
 
 function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAutoLogin, setIsAutoLogin] = useState(false);
   const [isChecked, setIsChecked] = useState(true);
   const [fontsLoaded] = useFonts({
     RobotoMedium: Roboto_500Medium,
@@ -24,15 +29,19 @@ function LoginScreen({ navigation }) {
 
   const autoLogin = async () => {
     try {
+      
       const savedUsername = await AsyncStorage.getItem('username');
       const savedPassword = await AsyncStorage.getItem('password');
 
       if (savedUsername !== null && savedPassword !== null) {
+        setIsAutoLogin(true);
         setUsername(savedUsername);
         setPassword(savedPassword);
 
         if (username && password)
           handleLogin();
+      }else{
+        setIsAutoLogin(false);
       }
     } catch (error) {
       console.error('Erro ao recuperar os dados de login:', error);
@@ -59,7 +68,7 @@ function LoginScreen({ navigation }) {
       .get(
         `https://piantecheguariscono.pro/api/auth/generate_auth_cookie/?nonce=f4320f4a67&username=${username}&password=${password}`
       )
-      .then((response) => {
+      .then((response) => {        
         if (response.data.status === "ok") {
           if (isChecked){
             AsyncStorage.setItem('username', username);
@@ -114,64 +123,79 @@ function LoginScreen({ navigation }) {
          source={require('../../assets/leaf-watter.png')} 
          style={{width: 80, height: 80, position: 'absolute', right: 0}}
         />
-        <Text style={{ fontSize: 14, color: "#ccc" }}>
-          Effettuare l'accesso
-        </Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome5 name="user" style={styles.searchIcon} />
-          <TextInput
-              style={styles.inputLabel}
-              autoCapitalize="none"
-              placeholder="Email"
-              placeholderTextColor="#4b7350"
-              onChangeText={setUsername}              
-              value={username}
-              onSubmitEditing={() => { this.passwordTextInput.focus(); }}
-          />
-        </View>
-        <View style={[styles.inputContainer, {marginTop: -8}]}>
-          <FontAwesome5 name="lock" style={styles.searchIcon} />
-          <TextInput
-              ref={(input) => { this.passwordTextInput = input; }}
-              style={styles.inputLabel}
-              autoCapitalize="none"
-              placeholder="Password"
-              placeholderTextColor="#4b7350"
-              autoCorrect={false}
-              secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
-              onSubmitEditing={() => {
-                handleLogin()
-              }}
-          />
-        </View>
-      </View>
-      <TouchableOpacity style={styles.checkboxContainer} onPress={toggleCheckbox}>
-        {isChecked ? (
-          <FontAwesome5 name="check-square" style={styles.checkedIcon} />
+        {isAutoLogin ? (
+          <Animatable.View style={{marginTop: 50}} animation={isAutoLogin ? 'rotate' : null} iterationCount="infinite">
+            <FontAwesome5 name="spinner" size={60} color="#4b7350" />
+          </Animatable.View>
         ) : (
-          <FontAwesome5 name="square" style={styles.uncheckedIcon} />
-        )}
-        <Text style={styles.labelCheckBox}>Ricordati di me</Text>
-      </TouchableOpacity>
-      
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
-          <View
-            style={[
-              styles.loginButton,
-              isLoading && styles.loadingButton,
-            ]}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="white" style={styles.loadingIndicator} />
-            ) : (
-              <Text style={styles.loginButtonText}>Accedere</Text>
-            )}
+          <View style={{flex: 1, width: "100%"}}>
+            <Text style={{ fontSize: 14, color: "#ccc", textAlign: "center" }}>
+              Effettuare l'accesso
+            </Text>
+            <View style={styles.inputContainer}>
+              <FontAwesome5 name="user" style={styles.searchIcon} />
+              <TextInput
+                  style={styles.inputLabel}
+                  autoCapitalize="none"
+                  placeholder="Email"
+                  placeholderTextColor="#4b7350"
+                  onChangeText={setUsername}              
+                  value={username}
+                  onSubmitEditing={() => { this.passwordTextInput.focus(); }}
+              />
+            </View>
+            <View style={[styles.inputContainer, {marginTop: -8}]}>
+              <FontAwesome5 name="lock" style={styles.searchIcon} />
+              <TextInput
+                  ref={(input) => { this.passwordTextInput = input; }}
+                  style={styles.inputLabel}
+                  autoCapitalize="none"
+                  placeholder="Password"
+                  placeholderTextColor="#4b7350"
+                  autoCorrect={false}
+                  secureTextEntry={true}
+                  value={password}
+                  onChangeText={setPassword}
+                  onSubmitEditing={() => {
+                    handleLogin()
+                  }}
+              />
+            </View>
           </View>
-        </TouchableOpacity>
+        )}
       </View>
+      {isAutoLogin ? (
+        <View></View>
+      ) : (
+        <TouchableOpacity style={styles.checkboxContainer} onPress={toggleCheckbox}>
+          {isChecked ? (
+            <FontAwesome5 name="check-square" style={styles.checkedIcon} />
+          ) : (
+            <FontAwesome5 name="square" style={styles.uncheckedIcon} />
+          )}
+          <Text style={styles.labelCheckBox}>Ricordati di me</Text>
+        </TouchableOpacity> 
+      )}
+      {isAutoLogin ? (
+        <View></View>
+      ) : (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
+            <View
+              style={[
+                styles.loginButton,
+                isLoading && styles.loadingButton,
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="white" style={styles.loadingIndicator} />
+              ) : (
+                <Text style={styles.loginButtonText}>Accedere</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
       
           
     </ScrollView>

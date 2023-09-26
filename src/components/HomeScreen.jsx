@@ -3,28 +3,27 @@ import { View, StatusBar, Text,
   StyleSheet, Image,    
   ScrollView  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFonts, Oswald_500Medium,Oswald_200ExtraLight } from '@expo-google-fonts/oswald';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { getArticles } from '../api/index'
+import { getArticles, getCategories } from '../api/index'
 import Articles from "./HomeScreenComponents/Articles";
 import Header from "./HomeScreenComponents/Header";
 import Categories from "./HomeScreenComponents/Categories";
 
 
 
-function HomeScreen({ navigation }) {
+function HomeScreen({ route }) {
   const [user, setUser] = useState(null);
   const [greeting, setGreeting] = useState('');
   const [iconWheater, setIconWheater] = useState('');
   const [articles, setArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(0);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMoreData, setHasMoreData] = useState(true)
-  const [fontsLoaded] = useFonts({
-    OswaldMedium: Oswald_500Medium,
-    OswaldLight: Oswald_200ExtraLight
-  });
-  
+  const [isLoadingMoreArticles, setIsLoadingMoreArticles] = useState(false);
+  const [isLoadingMoreCategories, setIsLoadingMoreCategories] = useState(false);
+  const [hasMoreDataArticles, setHasMoreDataArticles] = useState(true)
+  const [hasMoreDataCategories, setHasMoreDataCategories] = useState(true)
+  const { onTabChange } = route.params;
+
   async function getArticlesApi(page) {
     try {      
       const result = await getArticles(page);
@@ -33,13 +32,24 @@ function HomeScreen({ navigation }) {
       throw error;
     }
   }
+
+  async function getCategoriesApi(page) {
+    try {      
+      const result = await getCategories(page);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   useEffect(() => {
     loadMoreArticles()
+    loadMoreCategories()
   }, []);
 
   const loadMoreArticles = useCallback(async () => {    
-    if (isLoadingMore || !hasMoreData) return;
-    setIsLoadingMore(true);
+    if (isLoadingMoreArticles || !hasMoreDataArticles) return;
+    setIsLoadingMoreArticles(true);
   
     try {      
       let newPage = page + 1;      
@@ -47,7 +57,7 @@ function HomeScreen({ navigation }) {
       console.log(newPage)    
   
       if (result.data.length === 0) {        
-        setHasMoreData(false);
+        setHasMoreDataArticles(false);
       } else {
         setPage(newPage);
         setArticles([...articles, ...result.data]); 
@@ -55,9 +65,31 @@ function HomeScreen({ navigation }) {
     } catch (error) {
       console.error('Erro ao carregar mais artigos:', error);
     } finally {
-      setIsLoadingMore(false);
+      setIsLoadingMoreArticles(false);
     }
-  }, [page, articles, isLoadingMore, hasMoreData]);
+  }, [page, articles, isLoadingMoreArticles, hasMoreDataArticles]);
+
+  const loadMoreCategories = useCallback(async () => {    
+    if (isLoadingMoreCategories || !hasMoreDataCategories) return;
+    setIsLoadingMoreCategories(true);
+  
+    try {      
+      let newPage = page + 1;      
+      const result = await getCategoriesApi(newPage);  
+      console.log(newPage)    
+  
+      if (result.data.length === 0) {        
+        setHasMoreDataCategories(false);
+      } else {
+        setPage(newPage);
+        setCategories([...categories, ...result.data]); 
+      }
+    } catch (error) {
+      console.error('Erro ao carregar mais categorias:', error);
+    } finally {
+      setIsLoadingMoreCategories(false);
+    }
+  }, [page, categories, isLoadingMoreCategories, hasMoreDataCategories]);
 
 
   useEffect(() => {
@@ -102,49 +134,26 @@ function HomeScreen({ navigation }) {
     }
   };
 
-  const categories = [
-    { name: 'Categoria 1', image: require('../../assets/green-background.jpg') },
-    { name: 'Categoria 2', image: require('../../assets/green-background.jpg') },
-    { name: 'Categoria 3', image: require('../../assets/green-background.jpg') },
-    { name: 'Categoria 4', image: require('../../assets/green-background.jpg') },
-    { name: 'Categoria 5', image: require('../../assets/green-background.jpg') },
-    { name: 'Categoria 6', image: require('../../assets/green-background.jpg') },
-  ]
 
-  const renderCategoryPair = ({ item, index }) => {    
-    if (index % 2 === 0) {
-      const nextCategory = categories[index + 1];
-      return (
-        <View style={styles.categoryPair}>
-          <View style={styles.categoryItem}>
-            <Image source={item.image} style={styles.categoryImage} />
-            <Text style={styles.categoryText}>{item.name}</Text>
-          </View>
-          {nextCategory && (
-            <View style={styles.categoryItem}>
-              <Image source={nextCategory.image} style={styles.categoryImage} />
-              <Text style={styles.categoryText}>{nextCategory.name}</Text>
-            </View>
-          )}
-        </View>
-      );
-    }
-    return null;
-  };
 
   
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#dad7df" />
-      <Header user={user} greeting={greeting} iconWheater={iconWheater} />
+      <Header user={user} greeting={greeting} iconWheater={iconWheater} onTabChange={onTabChange}/>
       <ScrollView style={styles.scrollContainer}>           
         <Articles
           articles={articles}
           loadMoreArticles={loadMoreArticles}
-          isLoadingMore={isLoadingMore}
-          hasMoreData={hasMoreData}
+          isLoadingMore={isLoadingMoreArticles}
+          hasMoreData={hasMoreDataArticles}
         />        
-        <Categories categories={categories} />
+        <Categories 
+          categories={categories} 
+          loadMoreCategories={loadMoreCategories}
+          isLoadingMore={isLoadingMoreCategories}
+          onTabChange={onTabChange}
+        />
       </ScrollView>
     </View>
   );
@@ -196,7 +205,7 @@ const styles = StyleSheet.create({
     right: 0, 
   },
   labelTitle:{
-    fontFamily: 'OswaldLight',
+    fontFamily: 'DMSans_400Regular',
     fontSize: 12,    
   },
   categoryPair: {

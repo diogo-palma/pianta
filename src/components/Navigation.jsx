@@ -1,6 +1,7 @@
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator,TransitionPresets  } from '@react-navigation/stack';
 import LoginScreen from './LoginScreen';
 import DashboardScreen from './DashboardScreen';
+import ArticleDetailScreen from './HomeScreenComponents/ArticlesDetail';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,16 @@ const AppNavigator = () => {
         component={DashboardScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen 
+        name="ArticleDetail" 
+        component={ArticleDetailScreen} 
+        options={{
+          title: '',
+          ...TransitionPresets.SlideFromRightIOS,
+        }}
+        
+      />
+
     </Stack.Navigator>
   );
 }

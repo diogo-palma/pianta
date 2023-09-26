@@ -18,8 +18,7 @@ const login = async () => {
 };
 
 const getArticles = async (page) => {
-  try {    
-    console.log("oiii")    
+  try {        
     const token = await login();   
     console.log("page", page)
     const response = await axios.get(`${API_URL}/articles?page=${page}`, {
@@ -29,7 +28,23 @@ const getArticles = async (page) => {
       },
     });
 
-    console.log("response", response.data)
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getCategories = async (page) => {
+  try {    
+    
+    const token = await login();   
+    
+    const response = await axios.get(`${API_URL}/categories?page=${page}`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -37,4 +52,4 @@ const getArticles = async (page) => {
   }
 };
 
-export { getArticles };
+export { getArticles, getCategories };

@@ -1,15 +1,51 @@
 import React from 'react';
-import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { BASE_URL } from "@env";
+import {
+  useFonts,
+  DMSans_400Regular,
+  DMSans_400Regular_Italic,
+  DMSans_500Medium,
+  DMSans_500Medium_Italic,
+  DMSans_700Bold,
+  DMSans_700Bold_Italic,
+} from '@expo-google-fonts/dm-sans';
+import { useNavigation } from '@react-navigation/native';
+
 
 function Articles({ articles, loadMoreArticles, isLoadingMore, hasMoreData }) {
+
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_400Regular_Italic,
+    DMSans_500Medium,
+    DMSans_500Medium_Italic,
+    DMSans_700Bold,
+    DMSans_700Bold_Italic,
+  });
+
+  const navigation = useNavigation();
+
+
+  if (!fontsLoaded) {   
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Caricamento...</Text>
+      </View>
+    );
+  }
+
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-        <Image source={{ uri: `${BASE_URL}${item.image}` }} style={styles.backgroundImage} />
-      <Text style={styles.titleText}>{item.title}</Text>
-    </View>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('ArticleDetail', { article: item })}
+    >
+      <View style={styles.itemContainer}>
+          <Image source={{ uri: `${BASE_URL}${item.image}` }} style={styles.backgroundImage} />
+        <Text style={styles.titleText} numberOfLines={1}>{item.title}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -54,7 +90,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   titleText: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#4b7350cc',
     color: 'white',
     padding: 10,
     fontSize: 16,
@@ -66,8 +102,9 @@ const styles = StyleSheet.create({
     right: 0,
   },
   labelTitle: {
-    fontFamily: 'OswaldLight',
-    fontSize: 12,
+    fontFamily: 'DMSans_400Regular',
+    fontSize: 15,
+    marginBottom: 10
   },
 });
 
