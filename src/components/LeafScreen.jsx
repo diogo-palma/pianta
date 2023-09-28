@@ -10,7 +10,6 @@ import * as Animatable from 'react-native-animatable';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 
-
 import {
   useFonts,
   DMSans_400Regular,
@@ -42,6 +41,8 @@ function LeafScreen({ route }) {
     DMSans_700Bold,
     DMSans_700Bold_Italic,
   });
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function fetchCategories() {
@@ -115,7 +116,10 @@ function LeafScreen({ route }) {
   }, [page, plants, isLoadingMorePlants, hasMoreDataPlants, searchText, selectedCategory]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.itemContainer}>
+    <TouchableOpacity 
+      style={styles.itemContainer}
+      onPress={() => navigation.navigate('LeafDetail', { plant: item })}
+    >
       <View style={styles.containerInner}>
         <View style={styles.verticalIconContainer}>
           {item.plantgallery && item.plantgallery.length > 0 ? (
@@ -125,13 +129,16 @@ function LeafScreen({ route }) {
             />
           ) : (
             <View style={styles.emptyImageContainer}>
-                  <FontAwesome5 name="ban" size={40} color="#ccc" style={{marginTop: 4}} />
+                <FontAwesome5 name="seedling" size={25} color="#ccc" style={{marginTop: 7, marginLeft: 3}} />
             </View>
           )}
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.titleText} numberOfLines={1}>
             {item.name}
+          </Text>
+          <Text style={styles.scientificText} numberOfLines={1}>
+            {item.scientific_name}
           </Text>
           <Text style={styles.categoryText} numberOfLines={1}>
             {item.categories.name}
@@ -367,6 +374,10 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
     fontSize: 16,
   },
+  scientificText: {
+    fontFamily: "DMSans_400Regular",
+    fontSize: 12,
+  },
   categoryText: {
     fontFamily: "DMSans_500Medium",
     fontSize: 12,
@@ -382,7 +393,8 @@ const styles = StyleSheet.create({
   emptyImageContainer: {    
     marginLeft: 5,
     marginRight: 5,
-    height: 55  
+    height: 55,
+    width: 30
   },
   categoryItem: {
     margin: 5,    

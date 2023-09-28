@@ -44,7 +44,6 @@ function ArticleDetailScreen({ route }) {
           style={{ flex: 1 }}
         />
       </View>
-      
     </ScrollView>
   );
 }
