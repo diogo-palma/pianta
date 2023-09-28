@@ -49,7 +49,7 @@ function Header({ user, greeting, iconWheater, onTabChange }) {
           <Text style={styles.greeting}>{greeting}</Text>
           <Image style={styles.weatherIcon} source={iconWheater} />
         </View>
-        <TouchableWithoutFeedback onPress={() => handleFilterPress('Leaf', null)}>
+        <TouchableWithoutFeedback onPress={() => handleFilterPress('Leaf', {searchFocus: true})}>
           <View style={styles.inputContainer}>
             <FontAwesome5 name="search" style={styles.searchIcon}  />
             <Text

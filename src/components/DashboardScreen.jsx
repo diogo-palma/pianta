@@ -7,18 +7,41 @@ import HomeScreen from './HomeScreen';
 import LeafScreen from './LeafScreen'; 
 import LeafHeartScreen from './LeafHeartScreen'; 
 import SupportScreen from './SupportScreen'; 
+import { BackHandler } from "react-native";
 
 function DashboardScreen({ navigation }) {
   const tabsRef = useRef(null);
   const TabsNavigator = createBottomTabNavigator();
   const [activeTab, setActiveTab] = useState(null);
   const [dataTab, setDataTab] = useState(null)
+  const [screenHistory, setScreenHistory] = useState(['Home', null]); 
+
 
   const changeTab = (tabName, data) => {        
     setDataTab(data)
-    navigation.navigate(tabName, {categorySelected: data})    
+    console.log("eii",activeTab, tabName)
+    setScreenHistory([activeTab, tabName]);
+    navigation.navigate(tabName, {categorySelected: data, activeTab})    
     setActiveTab(tabName);
   }
+
+  function handleBackButtonClick() {
+    console.log("screenHistory",screenHistory)
+    console.log("screenHistory[0",screenHistory[0])
+    if (!screenHistory)
+      changeTab("Home") 
+    else
+      changeTab(screenHistory[0])    
+    //navigation.goBack();
+    return true;
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+    };
+  }, []);
   
   return (
     <View style={{ flex: 1 }}>
@@ -33,9 +56,16 @@ function DashboardScreen({ navigation }) {
               tabBarBackground="#4b7350"
               textColor="#FFFFFF"
               activeTabBackground="#FFFFFF"
-              navigationHandler={(screen) => {                
+              navigationHandler={(screen) => {     
+               
+                if (activeTab != screen){        
+                  console.log("screen", activeTab, screen)   
+                  setScreenHistory([activeTab, screen])
+                  console.log("screenHistory", screenHistory)
+                }
                 setActiveTab(screen)                
                 navigation.navigate(screen, {category: dataTab});
+                
                 setDataTab(null)
               }}
               activeTabName={activeTab}

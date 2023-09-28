@@ -52,4 +52,51 @@ const getCategories = async (page) => {
   }
 };
 
-export { getArticles, getCategories };
+const getPlants = async (page, query, category_id) => {
+  try {    
+    
+    const token = await login();   
+    console.log("page", page)
+    console.log("query", query)
+    console.log("category_id", category_id)
+    
+    let url = `${API_URL}/plants?page=${page}`
+    if (query){
+      url = url + `&category_name=${query}&name=${query}&scientific_name=${query}`
+    }
+    if (category_id){
+      url = url + `&category_id=${category_id}`
+    }
+    console.log("url", url)
+    const response = await axios.get(url, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getAllCategories = async () => {
+  try {    
+    
+    const token = await login();   
+    
+    const response = await axios.get(`${API_URL}/categoriesAll`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getArticles, getCategories, getPlants, getAllCategories };
