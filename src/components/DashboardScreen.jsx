@@ -8,30 +8,37 @@ import LeafScreen from './LeafScreen';
 import LeafHeartScreen from './LeafHeartScreen'; 
 import SupportScreen from './SupportScreen'; 
 import { BackHandler } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 function DashboardScreen({ navigation }) {
   const tabsRef = useRef(null);
   const TabsNavigator = createBottomTabNavigator();
   const [activeTab, setActiveTab] = useState(null);
-  const [dataTab, setDataTab] = useState(null)
-  const [screenHistory, setScreenHistory] = useState(['Home', null]); 
+  const [dataTab, setDataTab] = useState(null)  
 
 
   const changeTab = (tabName, data) => {        
     setDataTab(data)
-    console.log("eii",activeTab, tabName)
-    setScreenHistory([activeTab, tabName]);
+    console.log("eiiiii",tabName)    
     navigation.navigate(tabName, {categorySelected: data, activeTab})    
     setActiveTab(tabName);
   }
 
-  function handleBackButtonClick() {
-    console.log("screenHistory",screenHistory)
-    console.log("screenHistory[0",screenHistory[0])
-    if (!screenHistory)
-      changeTab("Home") 
-    else
-      changeTab(screenHistory[0])    
+  async function handleBackButtonClick() {  
+    console.log("activeTabName handle", activeTab)
+    // console.log("navigation", navigation)
+    // console.log("navigation get parent", navigation.getParent())
+    // console.log("navigation state", navigation.getState())
+    const navigationIndex = navigation.getState()
+    const historyPage = await AsyncStorage.getItem('historyPage')
+    console.log("historyPage", historyPage)
+    if (navigationIndex.index == 2){      
+      changeTab(historyPage)
+      return true;
+    }
+    changeTab("Home") 
     //navigation.goBack();
     return true;
   }
@@ -56,16 +63,10 @@ function DashboardScreen({ navigation }) {
               tabBarBackground="#4b7350"
               textColor="#FFFFFF"
               activeTabBackground="#FFFFFF"
-              navigationHandler={(screen) => {     
-               
-                if (activeTab != screen){        
-                  console.log("screen", activeTab, screen)   
-                  setScreenHistory([activeTab, screen])
-                  console.log("screenHistory", screenHistory)
-                }
+              navigationHandler={async (screen) => {
                 setActiveTab(screen)                
                 navigation.navigate(screen, {category: dataTab});
-                
+                await AsyncStorage.setItem('historyPage', screen);
                 setDataTab(null)
               }}
               activeTabName={activeTab}

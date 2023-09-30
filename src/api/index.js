@@ -99,4 +99,22 @@ const getAllCategories = async () => {
   }
 };
 
-export { getArticles, getCategories, getPlants, getAllCategories };
+const getPlantsHeart = async (page, query) => {
+  try {    
+    
+    const token = await login();   
+    
+    const response = await axios.get(`${API_URL}/plantsheart?page=${page}&heart_name=${query}`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getArticles, getCategories, getPlants, getAllCategories, getPlantsHeart };

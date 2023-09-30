@@ -10,15 +10,7 @@ import * as Animatable from 'react-native-animatable';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 
-import {
-  useFonts,
-  DMSans_400Regular,
-  DMSans_400Regular_Italic,
-  DMSans_500Medium,
-  DMSans_500Medium_Italic,
-  DMSans_700Bold,
-  DMSans_700Bold_Italic,
-} from '@expo-google-fonts/dm-sans';
+
 
 function LeafScreen({ route }) {  
   const [plants, setPlants] = useState([]);
@@ -33,14 +25,6 @@ function LeafScreen({ route }) {
   const [scrollRef, setScrollRef] = useState(null);
   const [isListBlocked, setIsListBlocked] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    DMSans_400Regular,
-    DMSans_400Regular_Italic,
-    DMSans_500Medium,
-    DMSans_500Medium_Italic,
-    DMSans_700Bold,
-    DMSans_700Bold_Italic,
-  });
 
   const navigation = useNavigation();
 
@@ -223,15 +207,7 @@ function LeafScreen({ route }) {
     
   }
 
-  
 
-  if (!fontsLoaded) {   
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Caricamento...</Text>
-      </View>
-    );
-  }
   
   
   return (
