@@ -76,7 +76,7 @@ function Categories({ categories, loadMoreCategories, isLoadingMore, onTabChange
     <View style={styles.container}>
       <Text style={styles.labelTitle}>Categorie</Text>
       <FlatList
-        data={categories}
+        data={categories}        
         renderItem={renderCategoryPair}
         keyExtractor={(item, index) => index.toString()}
         onEndReached={loadMoreCategories}

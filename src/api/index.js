@@ -52,13 +52,14 @@ const getCategories = async (page) => {
   }
 };
 
-const getPlants = async (page, query, category_id) => {
+const getPlants = async (page, query, category_id, plants_id) => {
   try {    
     
     const token = await login();   
     console.log("page", page)
     console.log("query", query)
     console.log("category_id", category_id)
+    console.log("plants_id", plants_id)
     
     let url = `${API_URL}/plants?page=${page}`
     if (query){
@@ -66,6 +67,9 @@ const getPlants = async (page, query, category_id) => {
     }
     if (category_id){
       url = url + `&category_id=${category_id}`
+    }
+    if (plants_id){
+      url = url + `&plants_id=${plants_id}`
     }
     console.log("url", url)
     const response = await axios.get(url, {

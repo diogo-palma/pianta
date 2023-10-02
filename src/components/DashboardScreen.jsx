@@ -34,8 +34,15 @@ function DashboardScreen({ navigation }) {
     const navigationIndex = navigation.getState()
     const historyPage = await AsyncStorage.getItem('historyPage')
     console.log("historyPage", historyPage)
+    console.log("navigationIndex.index", navigationIndex.index)
+    if (navigationIndex.index == 3){  
+      console.log("to aqui 3")
+      navigation.goBack();
+      return true;
+    }
     if (navigationIndex.index == 2){      
-      changeTab(historyPage)
+      console.log("to aqui 2")
+      navigation.goBack();
       return true;
     }
     changeTab("Home") 

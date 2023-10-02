@@ -140,14 +140,20 @@ function HomeScreen({ route }) {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#dad7df" />
+      
       <Header user={user} greeting={greeting} iconWheater={iconWheater} onTabChange={onTabChange}/>
+      
       <ScrollView style={styles.scrollContainer}>           
-        <Articles
-          articles={articles}
-          loadMoreArticles={loadMoreArticles}
-          isLoadingMore={isLoadingMoreArticles}
-          hasMoreData={hasMoreDataArticles}
-        />        
+        {user.capabilities.comprou_manual_plano && user.capabilities.comprou_manual_sucos ? (
+          <Articles
+            articles={articles}
+            loadMoreArticles={loadMoreArticles}
+            isLoadingMore={isLoadingMoreArticles}
+            hasMoreData={hasMoreDataArticles}
+          />       
+        ) : (
+          <View></View>
+        )}
         <Categories 
           categories={categories} 
           loadMoreCategories={loadMoreCategories}
